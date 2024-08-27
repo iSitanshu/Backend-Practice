@@ -10,3 +10,5 @@ export default defineConfig({
   },
   plugins: [react()],
 })
+
+// A proxy server acts as a middleman btw front and back and helps route request from the front to the back without exposing the backend'port to the browser
