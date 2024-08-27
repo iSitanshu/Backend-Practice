@@ -48,3 +48,5 @@ app.listen(port, () => {
 
 //CORS - doosre ko ghar k andar enter nhi krne denge 
 //Solution - proxy y SERVER k andar white listing
+// Tell backend deveoper to whitelist the everry port number - github-api mein personal personal data dete hai - yaa domain white list - etc
+// or use cors and proxy package
