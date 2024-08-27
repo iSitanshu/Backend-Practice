@@ -3,6 +3,7 @@
 import express from 'express';
 
 const app = express();
+// console.log(app)
 app.use(express.static('dist'))
 // app.get('/', (req,res) => {
 //     res.send('Server is ready');
