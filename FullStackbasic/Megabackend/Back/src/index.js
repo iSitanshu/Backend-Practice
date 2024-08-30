@@ -1,10 +1,7 @@
-// require('dotenv').config({path:'./env'})
+// require('dotenv').config({path:'./env'}) chal jaega lekin code consistency ko kharab krta hai
 
 import dotenv from 'dotenv'
-
 import express from 'express'
-import mongoose from 'mongoose'
-import {DB_NAME} from './constants.js'
 import connectDB from './db/index.js'
 
 dotenv.config({
@@ -32,7 +29,7 @@ connectDB()
 (async () => {
     try{
         await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
-        app.on("error",() => {
+        app.on("error",(error) => {
             console.log("ERROR: ",error);
             throw error
         }) we connected the server 
@@ -46,3 +43,5 @@ connectDB()
     }
 })()
 */
+
+
