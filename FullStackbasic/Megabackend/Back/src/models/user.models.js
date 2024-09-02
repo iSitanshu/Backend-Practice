@@ -48,6 +48,7 @@ const userSchema = new Schema(
     },{timestamp: true}
 )
 
+//Pre and PasswordCorrect are both middlewares 
 userSchema.pre("save", async function (next) {
     if(!this.isModified("password")) return next();
 
@@ -61,7 +62,7 @@ userSchema.methods.isPasswordCorrect = async function(password){
 
 userSchema.methods.generateAccessToken = function(){
     return jwt.sign(
-        {
+        { 
             _id: this._id,
             email: this.email,
             username: this.username,
