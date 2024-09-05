@@ -7,3 +7,5 @@ class ApiResponse {
     }
 }
 //code base likha jisse hamara kaam aasan hoga
+
+export { ApiResponse }

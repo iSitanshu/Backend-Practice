@@ -22,4 +22,4 @@ export {asyncHandler}
 //     }
 // }
 
-// helper file handles the requestHandler if something went wrong user should be unimformed. (Error Handling)
+// helper file - handles the requestHandler if something went wrong user should be unimformed. (Error Handling)
