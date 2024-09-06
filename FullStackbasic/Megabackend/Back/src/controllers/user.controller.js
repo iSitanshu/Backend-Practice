@@ -9,7 +9,7 @@ const registerUser = asyncHandler( async (req,res) => {
     // res.status(200).json({
     //     message: "chai aur code"
     // })
-
+    // console.log("Request Body = ",req.body);
     const { fullName, email, username, password } = req.body
     // console.log("Full name : ",fullName);
     // console.log("Email : ",email);
@@ -68,7 +68,7 @@ const registerUser = asyncHandler( async (req,res) => {
         password,
         username: username.toLowerCase()
     })
-    
+    console.log("The user model is = ",user)
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
