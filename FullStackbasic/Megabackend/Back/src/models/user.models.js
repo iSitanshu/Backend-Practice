@@ -87,3 +87,11 @@ userSchema.methods.generateRefreshToken = function(){
 }
 
 export const User = mongoose.model("User",userSchema)
+
+/*
+accessToken and refreshToken
+1. get expired in short term
+
+1. get expired in long term
+
+*/
