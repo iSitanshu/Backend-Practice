@@ -1,12 +1,15 @@
 import { ApiError } from "../utils/ApiError.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import jwt from "jsonwebtoken"
-import {User} from "../models/user.models.js"
+import { User } from "../models/user.models.js"
 
-export const verifyJWT = asyncHandler( async(req,res,next) => {
+export const verifyJWT = asyncHandler( async(req, _ ,next) => {
+    console.log("Cookies received: ", req.cookies); // Log the cookies
     try {
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","") //custom header ka chutiyapa
-    
+        // console.log("the request is = ",req)
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ",""); //custom header ka chutiyapa
+        // console.log("token in the auth.middleware = ",token);
+
         if(!token){
             throw new ApiError(401, "Unauthorized request")
         }
@@ -14,13 +17,14 @@ export const verifyJWT = asyncHandler( async(req,res,next) => {
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
     
         const user = await User.findById(decodedToken?._id).select("-password -refreshToken")
+        
         if(!user){
             // TODO: discuss about frontend
             throw new ApiError(401,"Invalid AccessToken")
         }
     
         req.user = user;
-        next()
+        next() //do function hote hai router mein function ko pata chal jae is liye next function likhte
     } catch (error) {
         throw new ApiError(401,error?.message||"Invalid AccessToken")
     }

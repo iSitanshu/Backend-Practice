@@ -3,16 +3,21 @@ import { ApiError } from "../utils/ApiError.js"
 import { User } from '../models/user.models.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from "../utils/ApiResponse.js"
+import jwt from 'jsonwebtoken'
+import mongoose from 'mongoose'
 
 const generateAccessAndRefreshTokens = async(userId) => {
     try {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
+        // console.log("accessToken = ",accessToken," and ","another Token = ",refreshToken)
 
         user.refreshToken = refreshToken
         await user.save({validateBeforeSave: false}) //validation no need to validate password to save refreshToken and accessToken
 
+        // console.log("AccessToken = ",accessToken," and ","RefreshToken ",refreshToken);
+        
         return {accessToken, refreshToken}
 
     } catch (error) {
@@ -49,6 +54,7 @@ const registerUser = asyncHandler( async (req,res) => {
     const existedUser = await User.findOne({
         $or: [{ username },{ email }]
     })
+
     if(existedUser){
         throw new ApiError(409, "User with email or username already exist")
     }
@@ -107,17 +113,25 @@ const registerUser = asyncHandler( async (req,res) => {
     return res.status(201).json(
         new ApiResponse(200,createdUser,"User registered successfully !!!")
     )
-
 } )
 
 const loginUser = asyncHandler(async(req,res) => {
+    //getting the user details from frontend
     const {username, email, password} = req.body
 
-    if(!(username || email)){
+    //currently we want both username and email 
+    //validate
+    if(!username && !email){
         throw new ApiError(400,"Username or password is required")
     }
 
+    // for either email or name
+    // if(!(username || email)){
+    //     throw new ApiError(400,"Username or password is required")
+    // }
+
     // Query
+    //checking in the data base server
     const user = await User.findOne({
         $or: [{username},{email}]
     }) //or operator find krega value ya too email k basis pr ya too username k basic pr
@@ -133,46 +147,64 @@ const loginUser = asyncHandler(async(req,res) => {
     }
     
     const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id)
+    // console.log("accessToken = ",accessToken," and ","refreshToken = ",refreshToken);
     
+    //remmove the unwanted field for security reasons
     const loggedInUser = await User.findById(user._id)
-    select("-password -refreshToken")
+    .select("-password -refreshToken")
+
+    // const options = {
+    //     httpOnly: true,
+    //     secure: true, //sirf aur sirf server se modifiable hoengi
+    // }
 
     const options = {
         httpOnly: true,
-        secure: true //sirf aur sirf server se modifiable hoengi
-    }
+        secure: false,
+        sameSite: 'None',
+    };
 
     return res
-        .status(200)
-        .cookie("accessToken",accessToken, options)
-        .cookie("refreshToken",refreshToken, options)
-        .json(
-            new ApiResponse(
-                200,
-                {
-                    user: loginUser, acccessToken, refreshToken
-                },
-                "User logged in Successfully"
-            )
+    .status(200)
+    .cookie("accessToken",accessToken, options) //iss se cookie mein store hoga
+    .cookie("refreshToken",refreshToken, options) //iss se cookie mein store hoga
+    .json( //iss se json response ban k jaega user ki taraf
+        new ApiResponse(
+            200,
+            {
+                user: loggedInUser, accessToken, refreshToken
+            },
+            "User logged in Successfully"
         )
+    )
 }) 
+
 
 const logoutUser = asyncHandler(async (req,res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1
+                // refreshToken: 1 //this removes the field document
             }
         },
         {
             new: true
         }
     )
+
+    // const options = {
+    //     httpOnly: true,
+    //     secure: true
+    // }  
+
     const options = {
         httpOnly: true,
-        secure: true
-    }
+        secure: false,
+        sameSite: 'None',
+    };
+    
 
     return res
         .status(200)
