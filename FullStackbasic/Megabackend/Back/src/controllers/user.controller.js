@@ -4,7 +4,10 @@ import { User } from '../models/user.models.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from 'jsonwebtoken'
-import mongoose, { Aggregate } from 'mongoose'
+import mongoose from 'mongoose'
+import pkg from 'mongoose'
+// import { Aggregate } from "mongoose"
+const { Aggregate } = pkg;
 
 const generateAccessAndRefreshTokens = async(userId) => {
     try {
@@ -185,6 +188,7 @@ const logoutUser = asyncHandler(async (req,res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
+            //jo bhi field unset krni hai uss field pr unset paas krdo
             $unset: {
                 refreshToken: 1
                 // refreshToken: 1 //this removes the field document
