@@ -443,6 +443,7 @@ const getUserChannelProfile = asyncHandler(async(req,res) => {
     )
 })
 
+// WE GET THE GETWATCHHISTORY
 const getWatchHistory = asyncHandler(async(req,res) => {
     const user = await User.aggregate([
         {
